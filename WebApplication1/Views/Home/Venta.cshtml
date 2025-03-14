@@ -1,0 +1,161 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Ventas</title>
+    <link rel="stylesheet" href="~/css/Venta.css" asp-append-version="true">
+</head>
+<body>
+    <h1>Gestión de Ventas</h1>
+
+    <div>
+        <h2>Listado de Ventas</h2>
+        <button onclick="mostrarFormulario()">Agregar Nueva Venta</button>
+        <button onclick="Reporte()">Reporte</button>
+        <table id="tablaVentas">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fecha de Venta</th>
+                    <th>Monto Total</th>
+                    <th style="display:none">Cliente ID</th>
+                    <th>Cliente</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div id="formularioVenta" style="display:none;">
+        <h2 id="tituloFormulario">Agregar Nueva Venta</h2>
+        <form id="formVenta">
+            <label for="fechaVenta">Fecha de Venta:</label>
+            <input type="date" id="fechaVenta" required><br>
+            <label for="montoTotal">Monto Total:</label>
+            <input type="number" id="montoTotal" required><br>
+            @*      <label for="clienteId">Cliente ID:</label>
+            <input type="number" id="clienteId" required><br>  *@
+            <label for="clienteId">Cliente:</label>
+            <select id="clienteId" required>
+                <option value="">Seleccione un cliente</option>
+            </select>
+            <br>
+
+            @* <button type="button" onclick="validar()">Guardar</button> *@
+            <button type="button" onclick="ocultarFormulario()">Cancelar</button>
+            <!-- Botón para abrir el modal -->
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pagoModal" onclick="abrirModal()">Guardar</button>
+        </form>
+    </div>
+
+
+
+
+
+
+
+
+
+
+    <script src="~/js/Venta.js" asp-append-version="true"></script>
+
+</body>
+
+</html>
+<!-- Modal -->
+<div class="modal fade" id="pagoModal" tabindex="-1" aria-labelledby="pagoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pagoModalLabel">Realizar Pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="pagoForm">
+
+                    <div class="mb-3">
+                        <label id="montoTotalLabel"></label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tipoPago" class="form-label">Tipo de Pago</label>
+                        <select class="form-select" id="tipoPago" required>
+                            <option value="" disabled selected>Seleccione el tipo de pago</option>
+                            <option value="efectivo">Efectivo</option>
+                            <option value="qr">QR</option>
+                            <option value="tarjeta">Tarjeta</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="montoPago" class="form-label">Monto a Pagar</label>
+                        <input type="number" class="form-control" id="montoPago" placeholder="Ingrese el monto" required>
+                    </div>
+                </form>
+
+                <table class="table" id="tablaPagos">
+                    <thead>
+                        <tr>
+                            <th>Tipo de Pago</th>
+                            <th>Monto</th>
+                            <th>Acciones</th> <!-- Columna para el botón de eliminar -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Los pagos se agregarán aquí -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td id="totalMonto">0</td> <!-- Aquí se mostrará la suma de los montos -->
+                        </tr>
+                    </tfoot>
+                </table>
+
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnPagar" onclick="agregarPago()">agregarPago</button>
+                <button type="button" class="btn btn-primary" id="btnPagar" onclick="validar()">Pagar</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@* <!-- Modal -->
+<div class="modal fade" id="pagoModal" tabindex="-1" aria-labelledby="pagoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pagoModalLabel">Realizar Pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="pagoForm">
+                    <div class="mb-3">
+                        <label for="montoPago" class="form-label">Monto a Pagar</label>
+                        <input type="number" class="form-control" id="montoPago" placeholder="Ingrese el monto" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnPagar" onclick="validar()">Pagar</button>
+            </div>
+        </div>
+    </div>
+</div> *@

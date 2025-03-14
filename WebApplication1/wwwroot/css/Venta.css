@@ -1,0 +1,41 @@
+﻿
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+#tablaVentas {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    #tablaVentas th, #tablaVentas td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+button {
+    margin: 10px;
+    padding: 8px;
+    cursor: pointer;
+}
+
+form {
+    margin: 20px 0;
+}
+
+    form input {
+        margin: 10px;
+    }
+
+#formularioVenta {
+    margin: 20px;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+}

@@ -1,0 +1,200 @@
+
+
+create database ExamenDB;
+use ExamenDB;
+
+
+insert into Cliente values ('ERICK');
+insert into Cliente values ('MARIA');
+insert into Cliente values ('FERNANDA');
+SELECT * FROM Cliente
+
+
+create table Cliente(
+id int primary key identity(1,1),
+nombre varchar(50)
+)
+create table Venta(
+id int primary key identity(1,1),
+FechaVenta date not null,
+MontoTotal decimal(10,2)not null,
+ClienteId int,
+ FOREIGN KEY (ClienteId) REFERENCES Cliente(Id) 
+)
+
+INSERT INTO Venta (FechaVenta, MontoTotal, ClienteId)  
+VALUES ('2025-03-13', 150.75, 1);
+INSERT INTO Venta (FechaVenta, MontoTotal, ClienteId)  
+VALUES ('2025-03-13', 104.15, 2);
+
+
+CREATE TABLE Pago (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    FechaPago DATE NOT NULL,
+    MontoPago DECIMAL(10,2) NOT NULL,
+    VentaId INT NOT NULL,
+    FOREIGN KEY (VentaId) REFERENCES Venta(Id)  -- Relación con la tabla Venta
+);
+
+
+--o	Tabla Venta 
+--	Id: INT IDENTITY(1,1) (PRIMARY KEY, autoincremental).
+--	FechaVenta: DATE (obligatorio).
+--	MontoTotal: DECIMAL(10,2) (obligatorio).
+--	ClienteId: INT (Foreign Key a la tabla Cliente, obligatorio).
+--o	Tabla Pago 
+--	Id: INT IDENTITY(1,1) (PRIMARY KEY, autoincremental).
+--	FechaPago: DATE (obligatorio).
+--	MontoPago: DECIMAL(10,2) (obligatorio).
+--	VentaId: INT (Foreign Key a la tabla Venta, obligatorio).
+
+drop procedure  ObtenerListaVenta;
+CREATE PROCEDURE ObtenerListaVenta
+AS
+BEGIN
+    SELECT v.*, c.nombre FROM Venta v
+	inner join cliente c on v.ClienteId=c.id
+	;
+END;
+
+
+CREATE PROCEDURE ObtenerListaVentaId (@id INT)
+AS
+BEGIN
+    SELECT * FROM Venta WHERE id = @id;
+END;
+
+
+
+
+
+CREATE  PROCEDURE sp_abm_venta (
+    @accion INT,
+    @id INT = NULL,
+    @FechaVenta DATE = NULL,
+    @MontoTotal DECIMAL(10, 2) = NULL,
+    @ClienteId INT = NULL
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @filasAfectadas INT;
+    DECLARE @v_id INT;
+
+    -- Dependiendo de la acción, realizamos una operación diferente.
+    IF @accion = 1  -- REGISTRAR
+    BEGIN
+     
+
+        -- Insertar la nueva venta
+        INSERT INTO Venta (FechaVenta, MontoTotal, ClienteId)
+        VALUES (@FechaVenta, @MontoTotal, @ClienteId);
+
+        -- Obtener el ID de la venta insertada
+        SET @v_id = SCOPE_IDENTITY();  
+
+        -- Validar si se afectaron filas
+        SET @filasAfectadas = @@ROWCOUNT;
+        IF @filasAfectadas = 0
+        BEGIN
+            SELECT 'error' AS status, 'El registro no se pudo guardar.' AS response, '0' AS numsec;
+        END
+        ELSE
+        BEGIN
+            SELECT 'success' AS status, 'OK' AS response, CAST(@v_id AS VARCHAR) AS numsec;
+        END
+    END
+    ELSE IF @accion = 2  -- MODIFICAR
+    BEGIN
+  
+
+        -- Actualizar los datos de la venta
+        UPDATE Venta
+        SET FechaVenta = @FechaVenta, MontoTotal = @MontoTotal, ClienteId = @ClienteId
+        WHERE id = @id;
+
+        -- Validar si se afectaron filas
+        SET @filasAfectadas = @@ROWCOUNT;
+        IF @filasAfectadas = 0
+        BEGIN
+            SELECT 'error' AS status, 'El registro no se pudo modificar.' AS response, '0' AS numsec;
+        END
+        ELSE
+        BEGIN
+            SELECT 'success' AS status, 'OK' AS response, CAST(@id AS VARCHAR) AS numsec;
+        END
+    END
+    ELSE IF @accion = 3  -- CAMBIAR ESTADO
+    BEGIN
+        -- Validar si la venta ya está eliminada (suponiendo que uses un campo de estado, como en PostgreSQL)
+        -- Si la tabla no tiene un campo de estado, puedes omitir esta parte
+      
+        -- Cambiar estado de la venta
+        delete  from Venta
+        WHERE id = @id;
+
+        -- Validar si se afectaron filas
+        SET @filasAfectadas = @@ROWCOUNT;
+        IF @filasAfectadas = 0
+        BEGIN
+            SELECT 'error' AS status, 'El registro no se pudo eliminar.' AS response, '0' AS numsec;
+        END
+        ELSE
+        BEGIN
+            SELECT 'success' AS status, 'OK' AS response, CAST(@id AS VARCHAR) AS numsec;
+        END
+    END
+    ELSE
+    BEGIN
+        SELECT 'error' AS status, 'Ninguna acción coincide.' AS response, '0' AS numsec;
+    END
+END;
+
+
+
+
+drop table Pago;
+CREATE TABLE Pago(
+	Id int primary key IDENTITY(1,1) NOT NULL,
+	FechaPago date NOT NULL,
+	MontoPago decimal(10, 2) NOT NULL,
+	VentaId int NOT NULL,
+	TipoPago varchar(30)
+)
+
+
+
+
+create PROCEDURE sp_abm_pago (
+    @MontoPago DECIMAL(10,2),
+    @TipoPago VARCHAR(30),
+    @VentaId INT
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @v_id INT;
+
+    -- Insertar el nuevo pago
+    INSERT INTO pago (FechaPago, MontoPago, VentaId, TipoPago)
+    VALUES (CAST(GETDATE() AS DATE), @MontoPago, @VentaId, @TipoPago);
+
+    -- Obtener el ID insertado
+    SET @v_id = SCOPE_IDENTITY();
+
+    -- Validar si se afectaron filas
+    IF @v_id IS NULL OR @v_id = 0
+    BEGIN
+        SELECT 'error' AS status, 'El registro no se pudo guardar.' AS response, NULL AS numsec;
+        RETURN;
+    END
+
+    -- Retornar éxito
+    SELECT 'success' AS status, 'OK' AS response, CAST(@v_id AS VARCHAR) AS numsec;
+END;
+
+
+
+
+
